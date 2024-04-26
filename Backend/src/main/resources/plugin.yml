@@ -1,0 +1,22 @@
+name: RageSS
+version: '${project.version}'
+main: it.gaetanodev.backend.Backend
+depend:
+  - ProtocolLib
+commands:
+  playerspawn:
+    description: Imposta lo Spawn il sospetto
+    usage: /playerspawn
+    permission: ragewarss.admin
+  staffspawn:
+    description: Imposta lo Spawn per lo staff
+    usage: /staffspawn
+    permission: ragewarss.admin
+  fly:
+    description: Comando Fly
+    usage: /fly
+    permission: ragewarss.admin
+  ragess:
+    description: RageSS
+    usage: /ragess reload
+    permission: ragewarss.admin

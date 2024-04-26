@@ -1,0 +1,4 @@
+# Specifica il server in cui viene effettuato il controllo
+SS_SERVER: "ss"
+# Specifica il server in cui i giocatori vengono teletrasportati a fine controllo
+FALLBACK_SERVER: "hub"

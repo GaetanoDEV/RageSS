@@ -1,0 +1,25 @@
+staffSpawnLocation:
+  world: ""
+  x: ""
+  y: ""
+  z: ""
+
+playerSpawnLocation:
+  world: ""
+  x: ""
+  y: ""
+  z: ""
+
+title:
+  text: "&c&lCONTROLLO HACK"
+  subtitle: "&aSegui le istruzioni dello Staff"
+  fadeIn: 10
+  stay: 70
+  fadeOut: 20
+
+stafftitle:
+  text: "&b&lINIZIO CONTROLLO"
+  subtitle: " "
+  fadeIn: 10
+  stay: 70
+  fadeOut: 20
