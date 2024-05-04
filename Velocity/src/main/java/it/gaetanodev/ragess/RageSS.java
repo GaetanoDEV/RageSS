@@ -1,11 +1,16 @@
 package it.gaetanodev.ragess;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
+import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import it.gaetanodev.ragess.Commands.CleanCommand;
 import it.gaetanodev.ragess.Commands.SSCommand;
@@ -28,12 +33,15 @@ import java.nio.file.Paths;
 )
 public class RageSS {
     private final ProxyServer server;
+
     private final Logger logger;
+
     private CommentedConfigurationNode config;
 
 
+
     @Inject
-    public RageSS(RageSS instance, RageSS instance1, ProxyServer server, Logger logger) {
+     RageSS(ProxyServer server, Logger logger) {
         this.server = server;
         this.logger = logger;
 
@@ -56,21 +64,40 @@ public class RageSS {
     }
 
     @Subscribe
+    // Annulla l'invio dei comandi al giocatore
+    public void onPlayerChat(PlayerChatEvent event) {
+        Player player = event.getPlayer();
+        String message = event.getMessage();
+        String currentServerName = player.getCurrentServer().get().getServerInfo().getName();
+        String ssServerName = config.node("SS_SERVER").getString();
+
+        if (message.startsWith("/") && player.hasPermission("ragewarss.player") && currentServerName.equals(ssServerName)) {
+            // Minimessage
+            var mm = MiniMessage.miniMessage();
+            Component noCommand = mm.deserialize("<red>Non puoi eseguire comandi mentre sei nel server di controllo.");
+            player.sendMessage(noCommand);
+            event.setResult(PlayerChatEvent.ChatResult.denied());
+        }
+    }
+    @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         // Comando SS
+
         CommandManager commandManager = server.getCommandManager();
         CommandMeta sscommand = commandManager.metaBuilder("ss")
                 .aliases("ss")
                 .plugin(this)
                 .build();
-        commandManager.register(sscommand, new SSCommand(server, config));
+        commandManager.register(sscommand, new SSCommand((ProxyServer) server, config));
+
+
 
         // Comando Clean
         CommandMeta cleancommand = (CommandMeta) commandManager.metaBuilder("clean")
                 .aliases("clean")
                 .plugin(this)
                 .build();
-        commandManager.register(cleancommand, new CleanCommand(server, config));
+        commandManager.register(cleancommand, new CleanCommand((ProxyServer) server, config));
 
 
     }
@@ -95,5 +122,4 @@ public class RageSS {
 
     }
 }
-
 
