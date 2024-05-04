@@ -6,6 +6,8 @@ import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
@@ -64,21 +66,19 @@ public class RageSS {
     }
 
     @Subscribe
-    // Annulla l'invio dei comandi al giocatore
-    public void onPlayerChat(PlayerChatEvent event) {
-        Player player = event.getPlayer();
-        String message = event.getMessage();
-        String currentServerName = player.getCurrentServer().get().getServerInfo().getName();
-        String ssServerName = config.node("SS_SERVER").getString();
-
-        if (message.startsWith("/") && player.hasPermission("ragewarss.player") && currentServerName.equals(ssServerName)) {
-            // Minimessage
-            var mm = MiniMessage.miniMessage();
-            Component noCommand = mm.deserialize("<red>Non puoi eseguire comandi mentre sei nel server di controllo.");
-            player.sendMessage(noCommand);
-            event.setResult(PlayerChatEvent.ChatResult.denied());
+    public void onCommandExecute(CommandExecuteEvent event) {
+        if (event.getCommandSource() instanceof Player) {
+            Player player = (Player) event.getCommandSource();
+            if (player.hasPermission("ragewarss.player") && player.getCurrentServer().isPresent() && player.getCurrentServer().get().getServerInfo().getName().equals("ss")) {
+                event.setResult(CommandExecuteEvent.CommandResult.denied());
+                var mm = MiniMessage.miniMessage();
+                Component noCommand = mm.deserialize("<red>Non puoi eseguire comandi mentre sei nel server di controllo.");
+                player.sendMessage(noCommand);
+            }
         }
     }
+
+
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         // Comando SS
@@ -101,6 +101,7 @@ public class RageSS {
 
 
     }
+
 
 
     private void loadConfig() {
